@@ -5,9 +5,6 @@ from ariths_gen.wire_components import (
 from ariths_gen.core.arithmetic_circuits import (
     MultiplierCircuit,
 )
-from ariths_gen.core.logic_gate_circuits import (
-    TwoInputLogicGate
-)
 from ariths_gen.one_bit_circuits.one_bit_components import (
     HalfAdder,
     FullAdder

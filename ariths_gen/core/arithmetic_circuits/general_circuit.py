@@ -1,6 +1,5 @@
 from ariths_gen.core.logic_gate_circuits.logic_gate_circuit import (
-    OneInputLogicGate,
-    TwoInputLogicGate
+    ThreeInputLogicGate
 )
 from ariths_gen.wire_components import (
     Wire,
@@ -124,7 +123,7 @@ class GeneralCircuit():
         """
         # TODO should be refactored in ArithsGen rework
         # We should probably check also wire names for especially hierarchical generation
-        if isinstance(component, TwoInputLogicGate):
+        if isinstance(component, ThreeInputLogicGate):
             if component.disable_generation is False:
                 self.circuit_gates.append(component)
         else:
@@ -158,7 +157,7 @@ class GeneralCircuit():
         Returns:
             int: Number of instances of the same class type.
         """
-        if issubclass(cls, TwoInputLogicGate) and count_disabled_gates is False:
+        if issubclass(cls, ThreeInputLogicGate) and count_disabled_gates is False:
             return sum(isinstance(c, cls) for c in self.components if isinstance(c, cls) and c.disable_generation is False)
         else:
             return sum(isinstance(c, cls) for c in self.components)
@@ -173,7 +172,7 @@ class GeneralCircuit():
         """
         gates = []
         for c in self.components:
-            if isinstance(c, TwoInputLogicGate):
+            if isinstance(c, ThreeInputLogicGate):
                 if (c.disable_generation is False) and (verilog_output is False or getattr(c, "use_verilog_instance", False) is False):
                     gates.append(c)
             else:
@@ -191,7 +190,7 @@ class GeneralCircuit():
         """
         one_bit_comps = []
         for c in self.components:
-            if isinstance(c, TwoInputLogicGate):
+            if isinstance(c, ThreeInputLogicGate):
                 continue
             elif all(isinstance(i, Wire) for i in self.inputs):
                 one_bit_comps.append(c)
@@ -208,7 +207,7 @@ class GeneralCircuit():
         """
         multi_bit_comps = []
         for c in self.components:
-            if isinstance(c, TwoInputLogicGate):
+            if isinstance(c, ThreeInputLogicGate):
                 continue
             elif all(isinstance(i, Wire) for i in self.inputs):
                 continue
@@ -340,7 +339,7 @@ class GeneralCircuit():
         Returns:
             str: Flat Python code initialization of arithmetic circuit wires.
         """
-        return "".join([c.get_assign_python_flat() if isinstance(c, TwoInputLogicGate) else c.get_init_python_flat() for c in self.components])
+        return "".join([c.get_assign_python_flat() if isinstance(c, ThreeInputLogicGate) else c.get_init_python_flat() for c in self.components])
 
     def get_function_out_python_flat(self):
         """Generates flat Python code assignment of corresponding arithmetic circuit's output bus wires.
@@ -398,7 +397,7 @@ class GeneralCircuit():
         Returns:
             str: Flat C code initialization of arithmetic circuit wires.
         """
-        return "".join([c.get_assign_c_flat() if isinstance(c, TwoInputLogicGate) else c.get_init_c_flat() for c in self.components])
+        return "".join([c.get_assign_c_flat() if isinstance(c, ThreeInputLogicGate) else c.get_init_c_flat() for c in self.components])
 
     def get_function_out_c_flat(self):
         """Generates flat C code assignment of corresponding arithmetic circuit's output bus wires.
@@ -469,7 +468,7 @@ class GeneralCircuit():
         Returns:
             str: Hierarchical C code initialization of arithmetic circuit wires.
         """
-        return "".join([c.get_gate_invocation_c() if isinstance(c, TwoInputLogicGate) else c.get_out_invocation_c() for c in self.components])
+        return "".join([c.get_gate_invocation_c() if isinstance(c, ThreeInputLogicGate) else c.get_out_invocation_c() for c in self.components])
 
     def get_out_invocation_c(self):
         """Generates hierarchical C code invocation of corresponding arithmetic circuit's generated function block.
@@ -546,7 +545,7 @@ class GeneralCircuit():
         Returns:
             str: Flat Verilog code initialization of arithmetic circuit wires.
         """
-        return "".join([c.get_assign_v_flat() if isinstance(c, TwoInputLogicGate) else c.get_init_v_flat() for c in self.components])
+        return "".join([c.get_assign_v_flat() if isinstance(c, ThreeInputLogicGate) else c.get_init_v_flat() for c in self.components])
 
     def get_function_out_v_flat(self):
         """Generates flat Verilog code assignment of corresponding arithmetic circuit's output bus wires.
@@ -614,7 +613,7 @@ class GeneralCircuit():
         Returns:
             str: Hierarchical Verilog code initialization of arithmetic circuit wires.
         """
-        return "".join([c.get_gate_invocation_v() if isinstance(c, TwoInputLogicGate) else c.get_out_invocation_v() for c in self.components])
+        return "".join([c.get_gate_invocation_v() if isinstance(c, ThreeInputLogicGate) else c.get_out_invocation_v() for c in self.components])
 
     def get_out_invocation_v(self):
         """Generates hierarchical Verilog code invocation of corresponding arithmetic circuit's generated function block.
