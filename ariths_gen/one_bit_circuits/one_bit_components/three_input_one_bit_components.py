@@ -36,9 +36,9 @@ class FullAdder(ThreeInputOneBitCircuit):
         self.add_component(obj_maji1)
         
         # cout
-        obj_maji2 = Maji(c, a, b [False, False, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=1, parent_component=self)
+        obj_maji2 = Maji(c, a, b, [False, False, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=1, parent_component=self)
         self.add_component(obj_maji2)
-        self.out.connect(1, obj_maji2)
+        self.out.connect(1, obj_maji2.out)
 
         # sum
         obj_maji3 = Maji(c, obj_maji1.out, obj_maji2.out, [False, False, True], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=0, parent_component=self)
