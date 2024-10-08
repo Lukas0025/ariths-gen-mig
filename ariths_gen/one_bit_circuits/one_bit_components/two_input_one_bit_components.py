@@ -1,6 +1,8 @@
 from ariths_gen.core.one_bit_circuits import TwoInputOneBitCircuit
 from ariths_gen.one_bit_circuits.logic_gates import AndGate, NandGate, OrGate, NorGate, XorGate, XnorGate, NotGate
+from ariths_gen.one_bit_circuits import Maji
 from ariths_gen.wire_components import Wire, Bus
+from ariths_gen.wire_components.wires import ConstantWireValue0
 
 
 class HalfAdder(TwoInputOneBitCircuit):
@@ -29,17 +31,18 @@ class HalfAdder(TwoInputOneBitCircuit):
         # 2 wires for component's bus output (sum, cout)
         self.out = Bus(self.prefix+"_out", 2)
 
-        # Sum
-        # XOR gate for calculation of 1-bit sum
-        obj_xor = XorGate(a, b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), outid=0, parent_component=self)
-        self.add_component(obj_xor)
-        self.out.connect(0, obj_xor.out)
-
-        # Cout
-        # AND gate for calculation of 1-bit cout
-        obj_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
+        obj_or   = OrGate (a, b, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), outid=0, parent_component=self)
+        self.add_component(obj_or)
+        
+        # cout
+        obj_and  = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=OrGate)), outid=1, parent_component=self)
         self.add_component(obj_and)
         self.out.connect(1, obj_and.out)
+
+        # sum
+        obj_maji = Maji(obj_or.out, obj_and.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=0, parent_component=self)
+        self.add_component(obj_maji)
+        self.out.connect(0, obj_maji.out)
 
     def get_sum_wire(self):
         """Get output wire carrying sum value.

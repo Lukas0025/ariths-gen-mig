@@ -1,3 +1,4 @@
+from ariths_gen.one_bit_circuits import Maji
 from ariths_gen.wire_components.wires import ConstantWireValue0
 from ariths_gen.core.one_bit_circuits import ThreeInputOneBitCircuit
 from ariths_gen.one_bit_circuits.logic_gates import AndGate, NandGate, OrGate, NorGate, XorGate, XnorGate, NotGate
@@ -30,28 +31,19 @@ class FullAdder(ThreeInputOneBitCircuit):
         super().__init__(a, b, c, prefix=prefix, name=name)
         # 2 wires for component's bus output (sum, cout)
         self.out = Bus(self.prefix+"_out", 2)
+        
+        obj_maji1 = Maji(c, a, b, [True, False, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=0, parent_component=self)
+        self.add_component(obj_maji1)
+        
+        # cout
+        obj_maji2 = Maji(c, a, b [False, False, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=1, parent_component=self)
+        self.add_component(obj_maji2)
+        self.out.connect(1, obj_maji2)
 
-        # PG logic
-        propagate_xor = XorGate(a, b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
-        self.add_component(propagate_xor)
-        generate_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
-        self.add_component(generate_and)
-
-        # Sum
-        # XOR gate for calculation of 1-bit sum
-        obj_xor = XorGate(propagate_xor.out, c, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), outid=0, parent_component=self)
-        self.add_component(obj_xor)
-        self.out.connect(0, obj_xor.out)
-
-        # Cout
-        # AND gate for calculation of 1-bit cout
-        obj_and = AndGate(propagate_xor.out, c, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
-        self.add_component(obj_and)
-
-        obj_or = OrGate(generate_and.out, obj_and.out, prefix=self.prefix+"_or"+str(self.get_instance_num(cls=OrGate)), outid=1, parent_component=self)
-        self.add_component(obj_or)
-
-        self.out.connect(1, obj_or.out)
+        # sum
+        obj_maji3 = Maji(c, obj_maji1.out, obj_maji2.out, [False, False, True], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=0, parent_component=self)
+        self.add_component(obj_maji3)
+        self.out.connect(0, obj_maji3.out)
 
     def get_sum_wire(self):
         """Get output wire carrying sum value.
