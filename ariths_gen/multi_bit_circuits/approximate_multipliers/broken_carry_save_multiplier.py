@@ -9,6 +9,9 @@ from ariths_gen.one_bit_circuits.one_bit_components import (
     HalfAdder,
     FullAdder
 )
+from ariths_gen.core.logic_gate_circuits import (
+    ThreeInputLogicGate
+)
 from ariths_gen.one_bit_circuits.logic_gates import (
     AndGate
 )
@@ -184,7 +187,7 @@ class UnsignedBrokenCarrySaveMultiplier(MultiplierCircuit):
                     previous_sums.append(ConstantWireValue0())
                 else:
                     prev_sum_obj = self.get_previous_component((final_cpa_N-2-wire_id)*2) if wire_id < final_cpa_N-2 else self.get_previous_component()
-                    if isinstance(prev_sum_obj, TwoInputLogicGate):
+                    if isinstance(prev_sum_obj, ThreeInputLogicGate):
                         previous_sums.append(prev_sum_obj.out)
                     else:
                         previous_sums.append(prev_sum_obj.get_sum_wire())
@@ -192,7 +195,7 @@ class UnsignedBrokenCarrySaveMultiplier(MultiplierCircuit):
                     previous_carries.append(ConstantWireValue0())
                 else:
                     prev_carry_obj = self.get_previous_component((final_cpa_N-2-wire_id)*2+2)
-                    if isinstance(prev_carry_obj, TwoInputLogicGate):
+                    if isinstance(prev_carry_obj, ThreeInputLogicGate):
                         previous_carries.append(prev_carry_obj.out)
                     else:
                         previous_carries.append(prev_carry_obj.get_carry_wire())

@@ -11,9 +11,11 @@ from ariths_gen.one_bit_circuits.logic_gates import (
     NandGate,
     OrGate,
     NorGate,
-    XorGate,
-    XnorGate,
     NotGate
+)
+from ariths_gen.one_bit_circuits.one_bit_components import (
+    XorGateComponent,
+    XnorGateComponent,
 )
 import re
 
@@ -98,13 +100,13 @@ class UnsignedCGPCircuit(GeneralCircuit):
             elif fn == 3:  # OR
                 o = self.add_component(OrGate(a, b, **comp_set)).out
             elif fn == 4:  # XOR
-                o = self.add_component(XorGate(a, b, **comp_set)).out
+                o = self.add_component(XorGateComponent(a, b, **comp_set)).out.get_wire(0)
             elif fn == 5:  # NAND
                 o = self.add_component(NandGate(a, b, **comp_set)).out
             elif fn == 6:  # NOR
                 o = self.add_component(NorGate(a, b, **comp_set)).out
             elif fn == 7:  # XNOR
-                o = self.add_component(XnorGate(a, b, **comp_set)).out
+                o = self.add_component(XnorGateComponent(a, b, **comp_set)).out.get_wire(0)
             elif fn == 8:  # TRUE
                 o = ConstantWireValue1()
             elif fn == 9:  # FALSE

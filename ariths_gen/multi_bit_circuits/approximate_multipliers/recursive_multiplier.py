@@ -8,11 +8,13 @@ from ariths_gen.core.arithmetic_circuits import (
 from ariths_gen.one_bit_circuits.logic_gates import (
     AndGate,
     OrGate,
-    XorGate,
     NotGate
 )
 from ariths_gen.multi_bit_circuits.adders import (
     UnsignedCarryLookaheadAdder
+)
+from ariths_gen.one_bit_circuits.one_bit_components import (
+    XorGateComponent
 )
 import math
 
@@ -64,15 +66,15 @@ class UnsignedAccurateTwoBitMultiplier(MultiplierCircuit):
         and_obj3 = AndGate(self.a.get_wire(1), self.b.get_wire(0), prefix=self.prefix+"_and2")
         and_obj4 = AndGate(self.a.get_wire(1), self.b.get_wire(1), prefix=self.prefix+"_and3")
 
-        xor_obj1 = XorGate(and_obj2.out, and_obj3.out, prefix=self.prefix+"_xor0")
+        xor_obj1 = XorGateComponent(and_obj2.out, and_obj3.out, prefix=self.prefix+"_xor0")
         and_obj5 = AndGate(and_obj2.out, and_obj3.out, prefix=self.prefix+"_and4")
-        xor_obj2 = XorGate(and_obj5.out, and_obj4.out, prefix=self.prefix+"_xor1")
+        xor_obj2 = XorGateComponent(and_obj5.out, and_obj4.out, prefix=self.prefix+"_xor1")
         and_obj6 = AndGate(and_obj5.out, and_obj4.out, prefix=self.prefix+"_and5")
         [self.add_component(obj) for obj in [and_obj1, and_obj2, and_obj3, and_obj4, xor_obj1, and_obj5, xor_obj2, and_obj6]]
 
         self.out.connect(0, and_obj1.out)
-        self.out.connect(1, xor_obj1.out)
-        self.out.connect(2, xor_obj2.out)
+        self.out.connect(1, xor_obj1.out.get_wire(0))
+        self.out.connect(2, xor_obj2.out.get_wire(0))
         self.out.connect(3, and_obj6.out)
 
 
@@ -209,14 +211,14 @@ class UnsignedApproximateTwoBitMultiplierM2(MultiplierCircuit):
         and_obj3 = AndGate(self.a.get_wire(1), self.b.get_wire(1), prefix=self.prefix+"_and2")
 
         and_obj4 = AndGate(and_obj1.out, and_obj2.out, prefix=self.prefix+"_and3")
-        xor_obj1 = XorGate(and_obj1.out, and_obj2.out, prefix=self.prefix+"_xor0")
+        xor_obj1 = XorGateComponent(and_obj1.out, and_obj2.out, prefix=self.prefix+"_xor0")
 
-        xor_obj2 = XorGate(and_obj4.out, and_obj3.out, prefix=self.prefix+"_xor1")
+        xor_obj2 = XorGateComponent(and_obj4.out, and_obj3.out, prefix=self.prefix+"_xor1")
         [self.add_component(obj) for obj in [and_obj1, and_obj2, and_obj3, and_obj4, xor_obj1, xor_obj2]]
 
         self.out.connect(0, and_obj4.out)
-        self.out.connect(1, xor_obj1.out)
-        self.out.connect(2, xor_obj2.out)
+        self.out.connect(1, xor_obj1.out.get_wire(0))
+        self.out.connect(2, xor_obj2.out.get_wire(0))
         self.out.connect(3, and_obj4.out)
 
 
@@ -360,11 +362,11 @@ class UnsignedApproximateTwoBitMultiplierM4(MultiplierCircuit):
         and_obj3 = AndGate(self.a.get_wire(1), self.b.get_wire(0), prefix=self.prefix+"_and2")
         and_obj4 = AndGate(self.a.get_wire(1), self.b.get_wire(1), prefix=self.prefix+"_and3")
 
-        xor_obj1 = XorGate(and_obj2.out, and_obj3.out, prefix=self.prefix+"_xor0")
+        xor_obj1 = XorGateComponent(and_obj2.out, and_obj3.out, prefix=self.prefix+"_xor0")
         [self.add_component(obj) for obj in [and_obj1, and_obj2, and_obj3, and_obj4, xor_obj1]]
 
         self.out.connect(0, and_obj1.out)
-        self.out.connect(1, xor_obj1.out)
+        self.out.connect(1, xor_obj1.out.get_wire(0))
         self.out.connect(2, and_obj4.out)
         self.out.connect(3, ConstantWireValue0())
 

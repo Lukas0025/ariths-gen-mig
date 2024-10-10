@@ -1,7 +1,8 @@
 from ariths_gen.one_bit_circuits import Maji
 from ariths_gen.wire_components.wires import ConstantWireValue0
 from ariths_gen.core.one_bit_circuits import ThreeInputOneBitCircuit
-from ariths_gen.one_bit_circuits.logic_gates import AndGate, NandGate, OrGate, NorGate, XorGate, XnorGate, NotGate
+from ariths_gen.one_bit_circuits.logic_gates import AndGate, NandGate, OrGate, NorGate, NotGate
+from .two_input_one_bit_components import XorGateComponent, XnorGateComponent
 from ariths_gen.wire_components import Wire, Bus
 
 
@@ -211,18 +212,18 @@ class PGSumLogic(ThreeInputOneBitCircuit):
         self.out = Bus(self.prefix+"_out", 3)
 
         # PG logic
-        propagate_xor = XorGate(a, b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), outid=0, parent_component=self)
+        propagate_xor = XorGateComponent(a, b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), outid=0, parent_component=self)
         self.add_component(propagate_xor)
-        self.out.connect(0, propagate_xor.out)
+        self.out.connect(0, propagate_xor.out.get_wire(0))
 
         generate_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
         self.add_component(generate_and)
         self.out.connect(1, generate_and.out)
 
         # Sum output
-        sum_xor = XorGate(propagate_xor.out, c, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), outid=2, parent_component=self)
+        sum_xor = XorGateComponent(propagate_xor.out.get_wire(0), c, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), outid=2, parent_component=self)
         self.add_component(sum_xor)
-        self.out.connect(2, sum_xor.out)
+        self.out.connect(2, sum_xor.out.get_wire(0))
 
     def get_propagate_wire(self):
         """Get output wire carrying propagate signal value.
@@ -289,11 +290,11 @@ class TwoOneMultiplexer(ThreeInputOneBitCircuit):
         and_obj = AndGate(a=self.a, b=self.get_previous_component().out, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
         self.add_component(and_obj)
 
-        xor_obj = XorGate(a=self.get_previous_component(3).out, b=self.get_previous_component().out, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+        xor_obj = XorGateComponent(a=self.get_previous_component(3).out, b=self.get_previous_component().out, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
         self.add_component(xor_obj)
 
         # Connection of MUX output wire
-        self.out.connect(0, xor_obj.out)
+        self.out.connect(0, xor_obj.out.get_wire(0))
 
     def get_mux_out_wire(self):
         """Get multiplexer output wire.
@@ -377,7 +378,7 @@ class FullSubtractor(ThreeInputOneBitCircuit):
         self.out = Bus(self.prefix+"_out", 2)
 
         # Difference
-        xor_obj = XorGate(a=self.a, b=self.b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+        xor_obj = XorGateComponent(a=self.a, b=self.b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
         self.add_component(xor_obj)
 
         not_obj = NotGate(a=self.a, prefix=self.prefix+"_not"+str(self.get_instance_num(cls=NotGate)), parent_component=self)
@@ -386,12 +387,12 @@ class FullSubtractor(ThreeInputOneBitCircuit):
         and_obj = AndGate(a=not_obj.out, b=self.b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
         self.add_component(and_obj)
 
-        difference_xor = XorGate(a=self.c, b=xor_obj.out, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), outid=0, parent_component=self)
+        difference_xor = XorGateComponent(a=self.c, b=xor_obj.out.get_wire(0), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), outid=0, parent_component=self)
         self.add_component(difference_xor)
-        self.out.connect(0, difference_xor.out)
+        self.out.connect(0, difference_xor.out.get_wire(0))
 
         # Borrow out
-        not_obj = NotGate(a=xor_obj.out, prefix=self.prefix+"_not"+str(self.get_instance_num(cls=NotGate)), parent_component=self)
+        not_obj = NotGate(a=xor_obj.out.get_wire(0), prefix=self.prefix+"_not"+str(self.get_instance_num(cls=NotGate)), parent_component=self)
         self.add_component(not_obj)
 
         and_obj = AndGate(a=not_obj.out, b=self.c, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)

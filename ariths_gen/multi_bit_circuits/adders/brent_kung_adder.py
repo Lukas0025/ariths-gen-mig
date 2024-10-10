@@ -10,9 +10,10 @@ from ariths_gen.one_bit_circuits.one_bit_components import (
     GreyCell,
     BlackCell
 )
-from ariths_gen.one_bit_circuits.logic_gates import (
-    XorGate
+from ariths_gen.one_bit_circuits.one_bit_components import (
+    XorGateComponent
 )
+
 import math
 
 
@@ -191,6 +192,6 @@ class SignedBrentKungAdder(UnsignedBrentKungAdder, GeneralCircuit):
         super().__init__(a=a, b=b, prefix=prefix, name=name, signed=True, **kwargs)
 
         # Additional XOR gates to ensure correct sign extension in case of sign addition
-        self.add_component(XorGate(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self))
-        self.add_component(XorGate(self.get_previous_component().out, self.get_previous_component(2).get_generate_wire(), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self))
-        self.out.connect(self.N, self.get_previous_component().out)
+        self.add_component(XorGateComponent(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self))
+        self.add_component(XorGateComponent(self.get_previous_component().out.get_wire(0), self.get_previous_component(2).get_generate_wire(), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self))
+        self.out.connect(self.N, self.get_previous_component().out.get_wire(0))

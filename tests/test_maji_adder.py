@@ -34,7 +34,7 @@ if __name__ == "__main__":
             expectedBus = (a + b) & 0xFF
 
         if (expectedBus != testOut):
-            print(f"expexted {expectedBus} have {testOut}")
+            print(f"expexted {a} + {b} = {expectedBus} have {testOut}")
             exit(1)
         
     print("Test maji as Ripple Carry Adder OK")

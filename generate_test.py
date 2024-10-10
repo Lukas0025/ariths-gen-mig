@@ -10,14 +10,14 @@ from ariths_gen.one_bit_circuits.logic_gates import (
     NandGate,
     OrGate,
     NorGate,
-    XorGate,
-    XnorGate,
     NotGate
 )
 
 from ariths_gen.one_bit_circuits.one_bit_components import (
     HalfAdder,
     FullAdder,
+    XorGateComponent,
+    XnorGateComponent,
     PGLogicBlock,
     FullAdderPG,
     TwoOneMultiplexer,

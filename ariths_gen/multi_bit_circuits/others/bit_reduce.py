@@ -9,7 +9,7 @@ from ariths_gen.one_bit_circuits.logic_gates import (
     OrGate
 )
 from ariths_gen.core.logic_gate_circuits import (
-    TwoInputLogicGate
+    ThreeInputLogicGate
 )
 
 
@@ -17,7 +17,7 @@ class BitReduce(GeneralCircuit):
     """Class representing tree reducer circuit. Doent work for NAND gate!
     """
 
-    def __init__(self, a: Bus, gate: TwoInputLogicGate, prefix: str = "", name: str = "bitreduce", **kwargs):
+    def __init__(self, a: Bus, gate: ThreeInputLogicGate, prefix: str = "", name: str = "bitreduce", **kwargs):
         self.N = a.N
         super().__init__(name=name, prefix=prefix, inputs=[a], out_N=1, **kwargs)
 

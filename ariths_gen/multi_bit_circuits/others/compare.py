@@ -42,7 +42,7 @@ class UnsignedCompareLT(GeneralCircuit):
             and1 = self.add_component(AndGate(i1, i2, f"{self.prefix}_and1_{i}")).out
             res[i] = self.add_component(AndGate(and1, psum, f"{self.prefix}_and2_{i}")).out
 
-            pi = self.add_component(XnorGate(iA, iB, f"{self.prefix}_pi_{i}", parent_component=self)).out
+            pi = self.add_component(XnorGateComponent(iA, iB, f"{self.prefix}_pi_{i}", parent_component=self)).out.get_wire(0)
             psum = self.add_component(AndGate(pi, psum, f"{self.prefix}_psum_{i}")).out
 
 
@@ -75,7 +75,7 @@ class UnsignedCompareLTE(GeneralCircuit):
             and1 = self.add_component(AndGate(i1, i2, f"{self.prefix}_and1_{i}")).out
             res[i] = self.add_component(AndGate(and1, psum, f"{self.prefix}_and2_{i}")).out
 
-            pi = self.add_component(XnorGate(iA, iB, f"{self.prefix}_pi_{i}", parent_component=self)).out
+            pi = self.add_component(XnorGateComponent(iA, iB, f"{self.prefix}_pi_{i}", parent_component=self)).out.get_wire(0)
             psum = self.add_component(AndGate(pi, psum, f"{self.prefix}_psum_{i}")).out
 
         res[self.N] = psum # or all equal (xor)
@@ -112,7 +112,7 @@ class UnsignedCompareGT(GeneralCircuit):
             and1 = self.add_component(AndGate(i1, i2, f"{self.prefix}_and1_{i}")).out
             res[i] = self.add_component(AndGate(and1, psum, f"{self.prefix}_and2_{i}")).out
 
-            pi = self.add_component(XnorGate(iA, iB, f"{self.prefix}_pi_{i}", parent_component=self)).out
+            pi = self.add_component(XnorGateComponent(iA, iB, f"{self.prefix}_pi_{i}", parent_component=self)).out.get_wire(0)
             psum = self.add_component(AndGate(pi, psum, f"{self.prefix}_psum_{i}")).out
 
 
@@ -145,7 +145,7 @@ class UnsignedCompareGTE(GeneralCircuit):
             and1 = self.add_component(AndGate(i1, i2, f"{self.prefix}_and1_{i}", parent_component=self)).out
             res[i] = self.add_component(AndGate(and1, psum, f"{self.prefix}_and2_{i}", parent_component=self)).out
 
-            pi = self.add_component(XnorGate(iA, iB, f"{self.prefix}_pi_{i}", parent_component=self)).out
+            pi = self.add_component(XnorGateComponent(iA, iB, f"{self.prefix}_pi_{i}", parent_component=self)).out.get_wire(0)
             psum = self.add_component(AndGate(pi, psum, f"{self.prefix}_psum_{i}", parent_component=self)).out
 
         res[self.N] = psum # or all equal (xor)

@@ -8,6 +8,8 @@ from .three_input_one_bit_components import (
     FullAdder,
     FullAdderP,
     FullAdderPG,
+    XorGateComponent,
+    XnorGateComponent,
     PGSumLogic,
     TwoOneMultiplexer,
     FullSubtractor,

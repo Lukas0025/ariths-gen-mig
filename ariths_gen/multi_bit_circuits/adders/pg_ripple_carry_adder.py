@@ -6,12 +6,12 @@ from ariths_gen.core.arithmetic_circuits import (
     GeneralCircuit
 )
 from ariths_gen.one_bit_circuits.one_bit_components import (
-    PGSumLogic
+    PGSumLogic,
+    XorGateComponent
 )
 from ariths_gen.one_bit_circuits.logic_gates import (
     AndGate,
-    OrGate,
-    XorGate
+    OrGate
 )
 
 
@@ -136,8 +136,8 @@ class SignedPGRippleCarryAdder(UnsignedPGRippleCarryAdder, GeneralCircuit):
         super().__init__(a=a, b=b, prefix=prefix, name=name, signed=True, **kwargs)
 
         # Additional XOR gates to ensure correct sign extension in case of sign addition
-        sign_xor_1 = XorGate(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+        sign_xor_1 = XorGateComponent(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
         self.add_component(sign_xor_1)
-        sign_xor_2 = XorGate(sign_xor_1.out, self.get_previous_component(2).out, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+        sign_xor_2 = XorGateComponent(sign_xor_1.out.get_wire(0), self.get_previous_component(2).out, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
         self.add_component(sign_xor_2)
-        self.out.connect(self.N, sign_xor_2.out)
+        self.out.connect(self.N, sign_xor_2.out.get_wire(0))

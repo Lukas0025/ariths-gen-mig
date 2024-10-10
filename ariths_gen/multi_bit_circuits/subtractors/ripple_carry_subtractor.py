@@ -6,10 +6,11 @@ from ariths_gen.core.arithmetic_circuits import (
 )
 from ariths_gen.one_bit_circuits.one_bit_components import (
     HalfAdder,
-    FullAdder
+    FullAdder,
+    XorGateComponent
 )
 from ariths_gen.one_bit_circuits.logic_gates import (
-    XorGate, NotGate
+    NotGate
 )
 from ariths_gen.wire_components.wires import ConstantWireValue1
 
@@ -101,8 +102,8 @@ class SignedRippleCarrySubtractor(UnsignedRippleCarrySubtractor, GeneralCircuit)
         super().__init__(a=a, b=b, prefix=prefix, name=name, signed=True, **kwargs)
 
         # Additional XOR gates to ensure correct sign extension in case of sign addition
-        sign_xor_1 = XorGate(self.get_previous_component(2).a, self.get_previous_component(2).b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+        sign_xor_1 = XorGateComponent(self.get_previous_component(2).a, self.get_previous_component(2).b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
         self.add_component(sign_xor_1)
-        sign_xor_2 = XorGate(sign_xor_1.out, self.get_previous_component(3).get_carry_wire(), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+        sign_xor_2 = XorGateComponent(sign_xor_1.out.get_wire(0), self.get_previous_component(3).get_carry_wire(), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
         self.add_component(sign_xor_2)
-        self.out.connect(self.N, sign_xor_2.out)
+        self.out.connect(self.N, sign_xor_2.out.get_wire(0))

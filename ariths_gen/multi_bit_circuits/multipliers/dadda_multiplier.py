@@ -11,10 +11,8 @@ from ariths_gen.core.arithmetic_circuits import (
 )
 from ariths_gen.one_bit_circuits.one_bit_components import (
     HalfAdder,
-    FullAdder
-)
-from ariths_gen.one_bit_circuits.logic_gates import (
-    XorGate
+    FullAdder,
+    XorGateComponent
 )
 
 
@@ -231,6 +229,6 @@ class SignedDaddaMultiplier(MultiplierCircuit):
             [self.out.connect(o, final_adder.out.get_wire(o-1), inserted_wire_desired_index=o-1) for o in range(1, len(self.out.bus))]
 
         # Final XOR to ensure proper sign extension
-        obj_xor = XorGate(ConstantWireValue1(), self.out.get_wire(self.out.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+        obj_xor = XorGateComponent(ConstantWireValue1(), self.out.get_wire(self.out.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
         self.add_component(obj_xor)
-        self.out.connect(self.out.N-1, obj_xor.out)
+        self.out.connect(self.out.N-1, obj_xor.out.get_wire(0))

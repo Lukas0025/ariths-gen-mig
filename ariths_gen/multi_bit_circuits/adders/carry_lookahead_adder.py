@@ -13,8 +13,10 @@ from ariths_gen.one_bit_circuits.one_bit_components import (
 )
 from ariths_gen.one_bit_circuits.logic_gates import (
     AndGate,
-    OrGate,
-    XorGate
+    OrGate
+)
+from ariths_gen.one_bit_circuits.one_bit_components import (
+    XorGateComponent
 )
 
 
@@ -84,8 +86,8 @@ class UnsignedCarryLookaheadAdder(GeneralCircuit):
                 generate_sig.append(pg_block.get_generate_wire())
                 self.add_component(pg_block)
 
-                self.add_component(XorGate(pg_block.get_sum_wire(), cin, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self))
-                self.out.connect(i+(block_n*cla_block_size), self.get_previous_component().out)
+                self.add_component(XorGateComponent(pg_block.get_sum_wire(), cin, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self))
+                self.out.connect(i+(block_n*cla_block_size), self.get_previous_component().out.get_wire(0))
 
                 # List of AND gates outputs that are later combined in a multi-bit OR gate
                 composite_or_gates_inputs = []
@@ -160,8 +162,8 @@ class SignedCarryLookaheadAdder(UnsignedCarryLookaheadAdder, GeneralCircuit):
         super().__init__(a=a, b=b, cla_block_size=cla_block_size, prefix=prefix, name=name, signed=True, **kwargs)
 
         # Additional XOR gates to ensure correct sign extension in case of sign addition
-        sign_xor_1 = XorGate(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+        sign_xor_1 = XorGateComponent(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
         self.add_component(sign_xor_1)
-        sign_xor_2 = XorGate(sign_xor_1.out, self.get_previous_component(2).out, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+        sign_xor_2 = XorGateComponent(sign_xor_1.out.get_wire(0), self.get_previous_component(2).out, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
         self.add_component(sign_xor_2)
-        self.out.connect(self.N, sign_xor_2.out)
+        self.out.connect(self.N, sign_xor_2.out.get_wire(0))

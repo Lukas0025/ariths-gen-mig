@@ -1,6 +1,7 @@
 from ariths_gen.wire_components.wires import ConstantWireValue0
 from ariths_gen.core.one_bit_circuits import FourInputOneBitCircuit
-from ariths_gen.one_bit_circuits.logic_gates import AndGate, NandGate, OrGate, NorGate, XorGate, XnorGate, NotGate
+from ariths_gen.one_bit_circuits.logic_gates import AndGate, NandGate, OrGate, NorGate, NotGate
+from ariths_gen.one_bit_circuits.one_bit_components import XorGateComponent, XnorGateComponent
 from ariths_gen.wire_components import Wire, Bus
 
 

@@ -11,11 +11,11 @@ from ariths_gen.core.logic_gate_circuits import (
 from ariths_gen.one_bit_circuits.one_bit_components import (
     HalfAdder,
     FullAdder,
-    TwoOneMultiplexer
+    TwoOneMultiplexer,
+    XorGateComponent
 )
 from ariths_gen.one_bit_circuits.logic_gates import (
-    AndGate,
-    XorGate
+    AndGate
 )
 
 
@@ -80,9 +80,9 @@ class UnsignedCarrySkipAdder(GeneralCircuit):
             block_size = bypass_block_size if N_wires >= bypass_block_size else N_wires
             for i in range(block_size):
                 # Generate propagate wires for corresponding bit pairs
-                propagate_xor = XorGate(a=self.a.get_wire((block_n*bypass_block_size)+i), b=self.b.get_wire((block_n*bypass_block_size)+i), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate)), parent_component=self)
+                propagate_xor = XorGateComponent(a=self.a.get_wire((block_n*bypass_block_size)+i), b=self.b.get_wire((block_n*bypass_block_size)+i), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
                 self.add_component(propagate_xor)
-                propagate_wires.append(propagate_xor.out)
+                propagate_wires.append(propagate_xor.out.get_wire(0))
 
                 if block_n == 0 and i == 0:
                     obj_adder = HalfAdder(a=self.a.get_wire((block_n*bypass_block_size)+i), b=self.b.get_wire((block_n*bypass_block_size)+i), prefix=self.prefix+"_ha"+str(self.get_instance_num(cls=HalfAdder)))
@@ -159,8 +159,8 @@ class SignedCarrySkipAdder(UnsignedCarrySkipAdder, GeneralCircuit):
         super().__init__(a=a, b=b, bypass_block_size=bypass_block_size, prefix=prefix, name=name, signed=True, **kwargs)
 
         # Additional XOR gates to ensure correct sign extension in case of sign addition
-        sign_xor_1 = XorGate(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate, count_disabled_gates=False)), parent_component=self)
+        sign_xor_1 = XorGateComponent(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate, count_disabled_gates=False)), parent_component=self)
         self.add_component(sign_xor_1)
-        sign_xor_2 = XorGate(sign_xor_1.out, self.get_previous_component(2).out.get_wire(), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate, count_disabled_gates=False)), parent_component=self)
+        sign_xor_2 = XorGateComponent(sign_xor_1.out.get_wire(0), self.get_previous_component(2).out.get_wire(), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate, count_disabled_gates=False)), parent_component=self)
         self.add_component(sign_xor_2)
-        self.out.connect(self.N, sign_xor_2.out)
+        self.out.connect(self.N, sign_xor_2.out.get_wire(0))

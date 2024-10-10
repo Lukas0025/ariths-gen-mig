@@ -8,13 +8,13 @@ from ariths_gen.core.arithmetic_circuits import (
 )
 from ariths_gen.one_bit_circuits.one_bit_components import (
     HalfAdder,
-    FullAdder
+    FullAdder,
+    XorGateComponent
 )
 from ariths_gen.one_bit_circuits.logic_gates import (
     AndGate,
     NandGate,
-    NorGate,
-    XorGate
+    NorGate
 )
 
 
@@ -235,7 +235,7 @@ class SignedArrayMultiplier(MultiplierCircuit):
                     self.out.connect(b_multiplier_index + a_multiplicand_index, obj_adder.get_sum_wire())
 
                     if a_multiplicand_index == self.N-1:
-                        obj_xor = XorGate(self.get_previous_component().get_carry_wire(), ConstantWireValue1(), prefix=self.prefix+"_xor"+str(a_multiplicand_index+1)+"_"+str(b_multiplier_index), parent_component=self)
+                        obj_xor = XorGateComponent(self.get_previous_component().get_carry_wire(), ConstantWireValue1(), prefix=self.prefix+"_xor"+str(a_multiplicand_index+1)+"_"+str(b_multiplier_index), parent_component=self)
                         self.add_component(obj_xor)
 
-                        self.out.connect(self.out.N-1, obj_xor.out)
+                        self.out.connect(self.out.N-1, obj_xor.out.get_wire(0))

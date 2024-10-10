@@ -3,7 +3,5 @@ from .logic_gates import (
     NandGate,
     OrGate,
     NorGate,
-    XorGate,
-    XnorGate,
     NotGate
 )
