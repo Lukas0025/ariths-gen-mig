@@ -29,6 +29,7 @@ class XorGateComponent(TwoInputOneBitCircuit):
         super().__init__(a, b, prefix=prefix, name=prefix)
         
         self.out = Bus(self.prefix+"_out", 1)
+        self.disable_generation = False
 
         obj_and1 = Maji(a, b, ConstantWireValue1(), inverts=[True, True, False],  prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), parent_component = parent_component)
         self.add_component(obj_and1)
@@ -65,6 +66,7 @@ class XnorGateComponent(TwoInputOneBitCircuit):
         super().__init__(a, b, prefix=prefix, name=prefix)
         
         self.out = Bus(self.prefix+"_out", 1)
+        self.disable_generation = True
 
         obj_and1 = Maji(a, b, ConstantWireValue1(), inverts=[True, True, False],  prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), parent_component = parent_component)
         self.add_component(obj_and1)
@@ -108,7 +110,7 @@ class HalfAdder(TwoInputOneBitCircuit):
         self.add_component(obj_or)
         
         # cout
-        obj_and  = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=OrGate)), outid=1, parent_component=self)
+        obj_and  = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
         self.add_component(obj_and)
         self.out.connect(1, obj_and.out)
 
@@ -200,16 +202,18 @@ class PGLogicBlock(TwoInputOneBitCircuit):
         self.out = Bus(self.prefix+"_out", 3)
 
         # PG logic
-        propagate_or = OrGate(a, b, prefix=self.prefix+"_or"+str(self.get_instance_num(cls=OrGate)), outid=0, parent_component=self)
+        propagate_or = OrGate (a, b, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), outid=0, parent_component=self)
         self.add_component(propagate_or)
+        
         generate_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
         self.add_component(generate_and)
-        sum_xor = XorGateComponent(a, b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), outid=2, parent_component=self)
+
+        sum_xor = Maji(propagate_or.out, generate_and.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=2, parent_component=self)        
         self.add_component(sum_xor)
 
         self.out.connect(0, propagate_or.out)
         self.out.connect(1, generate_and.out)
-        self.out.connect(2, sum_xor.out.get_wire(0))
+        self.out.connect(2, sum_xor.out)
 
     def get_propagate_wire(self):
         """Get output wire carrying propagate signal value.
@@ -262,7 +266,13 @@ class HalfSubtractor(TwoInputOneBitCircuit):
 
         # Difference
         # XOR gate for calculation of 1-bit difference
-        difference_xor = XorGateComponent(a=self.a, b=self.b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), outid=0, parent_component=self)
+        propagate_or = OrGate (a, b, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), outid=0, parent_component=self)
+        self.add_component(propagate_or)
+        
+        generate_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
+        self.add_component(generate_and)
+        
+        difference_xor = Maji(propagate_or.out, generate_and.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=0, parent_component=self)
         self.add_component(difference_xor)
         self.out.connect(0, difference_xor.out.get_wire(0))
 
@@ -271,7 +281,7 @@ class HalfSubtractor(TwoInputOneBitCircuit):
         not_obj = NotGate(a=self.a, prefix=self.prefix+"_not"+str(self.get_instance_num(cls=NotGate)), parent_component=self)
         self.add_component(not_obj)
 
-        borrow_and = AndGate(a=not_obj.out, b=self.b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), outid=1, parent_component=self)
+        borrow_and = AndGate(a=not_obj.out, b=self.b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
         self.add_component(borrow_and)
         self.out.connect(1, borrow_and.out)
 

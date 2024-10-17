@@ -2,7 +2,6 @@ from ariths_gen.one_bit_circuits import Maji
 from ariths_gen.wire_components.wires import ConstantWireValue0
 from ariths_gen.core.one_bit_circuits import ThreeInputOneBitCircuit
 from ariths_gen.one_bit_circuits.logic_gates import AndGate, NandGate, OrGate, NorGate, NotGate
-from .two_input_one_bit_components import XorGateComponent, XnorGateComponent
 from ariths_gen.wire_components import Wire, Bus
 
 
@@ -130,7 +129,17 @@ class FullAdderP(FullAdder, ThreeInputOneBitCircuit):
         super().__init__(a, b, c, prefix=prefix, name=name)
         # 3 wires for component's bus output (sum, cout, propagate)
         self.out.bus_extend(3)
-        self.out.connect(2, self.get_previous_component(5).out)
+
+        propagate_or = OrGate (a, b, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), outid=0, parent_component=self)
+        self.add_component(propagate_or)
+        
+        generate_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
+        self.add_component(generate_and)
+        
+        propagate_xor = Maji(propagate_or.out, generate_and.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=0, parent_component=self)
+        self.add_component(propagate_xor)
+
+        self.out.connect(2, propagate_xor.out)
 
     def get_propagate_wire(self):
         """Get output wire carrying propagate value.
@@ -212,18 +221,28 @@ class PGSumLogic(ThreeInputOneBitCircuit):
         self.out = Bus(self.prefix+"_out", 3)
 
         # PG logic
-        propagate_xor = XorGateComponent(a, b, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), outid=0, parent_component=self)
-        self.add_component(propagate_xor)
-        self.out.connect(0, propagate_xor.out.get_wire(0))
-
+        propagate_or = OrGate (a, b, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), outid=0, parent_component=self)
+        self.add_component(propagate_or)
+        
         generate_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
         self.add_component(generate_and)
         self.out.connect(1, generate_and.out)
+        
+        propagate_xor = Maji(propagate_or.out, generate_and.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=0, parent_component=self)
+        self.add_component(propagate_xor)
+        self.out.connect(0, propagate_xor.out)
 
         # Sum output
-        sum_xor = XorGateComponent(propagate_xor.out.get_wire(0), c, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), outid=2, parent_component=self)
-        self.add_component(sum_xor)
-        self.out.connect(2, sum_xor.out.get_wire(0))
+        obj_or2  = OrGate (propagate_xor.out, c, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), parent_component=self)
+        self.add_component(obj_or2)
+        
+        obj_and2 = AndGate(propagate_xor.out, c, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
+        self.add_component(obj_and2)
+
+        # final sum
+        obj_maji = Maji(obj_or2.out, obj_and2.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=2, parent_component=self)
+        self.add_component(obj_maji)
+        self.out.connect(2, obj_maji.out)
 
     def get_propagate_wire(self):
         """Get output wire carrying propagate signal value.
@@ -290,11 +309,20 @@ class TwoOneMultiplexer(ThreeInputOneBitCircuit):
         and_obj = AndGate(a=self.a, b=self.get_previous_component().out, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
         self.add_component(and_obj)
 
-        xor_obj = XorGateComponent(a=self.get_previous_component(3).out, b=self.get_previous_component().out, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self)
-        self.add_component(xor_obj)
+        # final xor
+
+        obj_or2  = OrGate (a=self.get_previous_component(3).out, b=self.get_previous_component().out, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), parent_component=self)
+        self.add_component(obj_or2)
+        
+        obj_and2 = AndGate(a=self.get_previous_component(3).out, b=self.get_previous_component().out, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
+        self.add_component(obj_and2)
+
+        # final sum
+        obj_maji = Maji(obj_or2.out, obj_and2.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), parent_component=self)
+        self.add_component(obj_maji)
 
         # Connection of MUX output wire
-        self.out.connect(0, xor_obj.out.get_wire(0))
+        self.out.connect(0, obj_maji.out)
 
     def get_mux_out_wire(self):
         """Get multiplexer output wire.
