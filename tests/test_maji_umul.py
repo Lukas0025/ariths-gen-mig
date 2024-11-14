@@ -22,7 +22,7 @@ if __name__ == "__main__":
         # try to test maji
         for a in range(256):
             for b in range(256):
-                testOut     = c_uint16(maji(a, b))
+                testOut     = c_uint16(maji(a, b)).value
                 expectedBus = c_uint16(c_uint8(a).value * c_uint8(b).value).value
 
             if (expectedBus != testOut):
