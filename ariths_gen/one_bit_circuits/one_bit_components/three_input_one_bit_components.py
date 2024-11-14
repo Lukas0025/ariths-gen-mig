@@ -300,25 +300,25 @@ class TwoOneMultiplexer(ThreeInputOneBitCircuit):
         self.out = Bus(self.prefix+"_out", 1)
 
         # 2:1MUX logic
-        and_obj = AndGate(a=self.b, b=self.c, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
-        self.add_component(and_obj)
+        and_obj1 = AndGate(a=self.b, b=self.c, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
+        self.add_component(and_obj1)
 
         not_obj = NotGate(a=self.c, prefix=self.prefix+"_not"+str(self.get_instance_num(cls=NotGate)), parent_component=self)
         self.add_component(not_obj)
 
-        and_obj = AndGate(a=self.a, b=self.get_previous_component().out, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
-        self.add_component(and_obj)
+        and_obj2 = AndGate(a=self.a, b=self.get_previous_component().out, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
+        self.add_component(and_obj2)
 
         # final xor
 
-        obj_or2  = OrGate (a=self.get_previous_component(3).out, b=self.get_previous_component().out, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), parent_component=self)
-        self.add_component(obj_or2)
+        obj_or  = OrGate (a=and_obj1.out, b=and_obj2.out, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), parent_component=self)
+        self.add_component(obj_or)
         
-        obj_and2 = AndGate(a=self.get_previous_component(3).out, b=self.get_previous_component().out, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
-        self.add_component(obj_and2)
+        obj_and3 = AndGate(a=and_obj1.out, b=and_obj2.out, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
+        self.add_component(obj_and3)
 
         # final sum
-        obj_maji = Maji(obj_or2.out, obj_and2.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), parent_component=self)
+        obj_maji = Maji(obj_or.out, obj_and3.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), parent_component=self)
         self.add_component(obj_maji)
 
         # Connection of MUX output wire

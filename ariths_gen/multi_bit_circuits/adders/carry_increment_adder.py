@@ -155,6 +155,6 @@ class SignedCarryIncrementAdder(UnsignedCarryIncrementAdder, GeneralCircuit):
         super().__init__(a=a, b=b, increment_block_size=increment_block_size, prefix=prefix, name=name, signed=True, **kwargs)
 
         # Additional XOR gates to ensure correct sign extension in case of sign addition
-        self.add_component(XorGateComponent(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate, count_disabled_gates=False)), parent_component=self))
-        self.add_component(XorGateComponent(self.get_previous_component().out.get_wire(0), self.out.get_wire(-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGate, count_disabled_gates=False)), parent_component=self))
+        self.add_component(XorGateComponent(self.a.get_wire(self.N-1), self.b.get_wire(self.N-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent, count_disabled_gates=False)), parent_component=self))
+        self.add_component(XorGateComponent(self.get_previous_component().out.get_wire(0), self.out.get_wire(-1), prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent, count_disabled_gates=False)), parent_component=self))
         self.out.connect(self.N, self.get_previous_component().out.get_wire(0))
