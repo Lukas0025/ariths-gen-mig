@@ -303,26 +303,17 @@ class TwoOneMultiplexer(ThreeInputOneBitCircuit):
         and_obj1 = AndGate(a=self.b, b=self.c, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
         self.add_component(and_obj1)
 
-        not_obj = NotGate(a=self.c, prefix=self.prefix+"_not"+str(self.get_instance_num(cls=NotGate)), parent_component=self)
-        self.add_component(not_obj)
-
-        and_obj2 = AndGate(a=self.a, b=self.get_previous_component().out, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
+        and_obj2 = Maji(self.a, self.c, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
         self.add_component(and_obj2)
 
-        # final xor
+        # final or
 
         obj_or  = OrGate (a=and_obj1.out, b=and_obj2.out, prefix=self.prefix+"_or" +str(self.get_instance_num(cls=OrGate)), parent_component=self)
         self.add_component(obj_or)
         
-        obj_and3 = AndGate(a=and_obj1.out, b=and_obj2.out, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), parent_component=self)
-        self.add_component(obj_and3)
-
-        # final sum
-        obj_maji = Maji(obj_or.out, obj_and3.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), parent_component=self)
-        self.add_component(obj_maji)
 
         # Connection of MUX output wire
-        self.out.connect(0, obj_maji.out)
+        self.out.connect(0, obj_or.out)
 
     def get_mux_out_wire(self):
         """Get multiplexer output wire.
