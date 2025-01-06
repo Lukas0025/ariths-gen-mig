@@ -3,7 +3,7 @@ from .two_input_one_bit_components import (
     HalfSubtractor,
     XorGateComponent,
     XnorGateComponent,
-    PGLogicBlock
+    partialAdder
 )
 
 from .three_input_one_bit_components import (

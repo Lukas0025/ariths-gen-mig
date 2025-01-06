@@ -18,7 +18,7 @@ from ariths_gen.one_bit_circuits.one_bit_components import (
     FullAdder,
     XorGateComponent,
     XnorGateComponent,
-    PGLogicBlock,
+    partialAdder,
     FullAdderPG,
     TwoOneMultiplexer,
     HalfSubtractor,

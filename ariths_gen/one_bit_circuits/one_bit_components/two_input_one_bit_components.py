@@ -177,15 +177,15 @@ class HalfAdder(TwoInputOneBitCircuit):
                f"endmodule"
 
 
-class PGLogicBlock(TwoInputOneBitCircuit):
+class partialAdder(TwoInputOneBitCircuit):
     """Class representing two input one bit propagate/generate logic block.
 
     ```
-        ┌──────┐
-    ───►│      ├─► P
-        │      ├─► G
-    ───►│      ├─► S
-        └──────┘
+            ┌──────┐
+    A   ───►│      ├─► P
+    B   ───►│      ├─► G
+    Cin ───►│      ├─► S
+            └──────┘
     ```
 
     Description of the __init__ method.
@@ -196,7 +196,7 @@ class PGLogicBlock(TwoInputOneBitCircuit):
         prefix (str, optional): Prefix name of pg logic block. Defaults to "".
         name (str, optional): Name of pg logic block. Defaults to "pg_logic".
     """
-    def __init__(self, a: Wire = Wire(name="a"), b: Wire = Wire(name="b"), prefix: str = "", name: str = "pg_logic"):
+    def __init__(self, a: Wire = Wire(name="a"), b: Wire = Wire(name="b"), cin: Wire = Wire(name="cin"), prefix: str = "", name: str = "pg_logic"):
         super().__init__(a, b, prefix=prefix, name=name)
         # 3 wires for component's bus output (propagate, generate, sum)
         self.out = Bus(self.prefix+"_out", 3)
@@ -208,12 +208,12 @@ class PGLogicBlock(TwoInputOneBitCircuit):
         generate_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
         self.add_component(generate_and)
 
-        sum_xor = Maji(propagate_or.out, generate_and.out, ConstantWireValue0(), [False, True, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=2, parent_component=self)        
-        self.add_component(sum_xor)
+        fa = FullAdder(self, a, b, cin, prefix=self.prefix+"_fa" +str(self.get_instance_num(cls=FullAdder)), parent_component=self)
+        self.add_component(fa)
 
         self.out.connect(0, propagate_or.out)
         self.out.connect(1, generate_and.out)
-        self.out.connect(2, sum_xor.out)
+        self.out.connect(2, fa.get_sum_wire())
 
     def get_propagate_wire(self):
         """Get output wire carrying propagate signal value.

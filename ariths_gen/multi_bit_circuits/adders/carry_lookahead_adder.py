@@ -9,7 +9,7 @@ from ariths_gen.core.logic_gate_circuits import (
     MultipleInputLogicGate
 )
 from ariths_gen.one_bit_circuits.one_bit_components import (
-    PGLogicBlock
+    partialAdder
 )
 from ariths_gen.one_bit_circuits.logic_gates import (
     AndGate,
@@ -81,13 +81,13 @@ class UnsignedCarryLookaheadAdder(GeneralCircuit):
 
             # Gradual addition of propagate/generate logic blocks and AND/OR gates for Cout bits generation, XOR gates for Sum bits generation
             for i in range(block_size):
-                pg_block = PGLogicBlock(self.a.get_wire((block_n*cla_block_size)+i), self.b.get_wire((block_n*cla_block_size)+i), prefix=self.prefix+"_pg_logic"+str(self.get_instance_num(cls=PGLogicBlock)))
+                pg_block = partialAdder(self.a.get_wire((block_n*cla_block_size)+i), self.b.get_wire((block_n*cla_block_size)+i), cin, prefix=self.prefix+"_partialAdder"+str(self.get_instance_num(cls=partialAdder)))
+                
                 propagate_sig.append(pg_block.get_propagate_wire())
                 generate_sig.append(pg_block.get_generate_wire())
-                self.add_component(pg_block)
 
-                self.add_component(XorGateComponent(pg_block.get_sum_wire(), cin, prefix=self.prefix+"_xor"+str(self.get_instance_num(cls=XorGateComponent)), parent_component=self))
-                self.out.connect(i+(block_n*cla_block_size), self.get_previous_component().out.get_wire(0))
+                self.add_component(pg_block)
+                self.out.connect(i+(block_n*cla_block_size), pg_block.get_sum_wire())
 
                 # List of AND gates outputs that are later combined in a multi-bit OR gate
                 composite_or_gates_inputs = []
