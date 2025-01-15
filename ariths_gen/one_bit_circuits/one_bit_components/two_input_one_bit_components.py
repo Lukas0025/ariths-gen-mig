@@ -1,4 +1,5 @@
-from ariths_gen.core.one_bit_circuits import TwoInputOneBitCircuit, FullAdder
+from ariths_gen.core.one_bit_circuits import TwoInputOneBitCircuit
+from .three_input_one_bit_components import FullAdder
 from ariths_gen.one_bit_circuits.logic_gates import AndGate, NandGate, OrGate, NorGate, NotGate
 from ariths_gen.one_bit_circuits import Maji
 from ariths_gen.wire_components import Wire, Bus
