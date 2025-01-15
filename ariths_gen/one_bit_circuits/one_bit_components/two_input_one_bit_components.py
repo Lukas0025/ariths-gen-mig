@@ -209,7 +209,7 @@ class partialAdder(TwoInputOneBitCircuit):
         generate_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
         self.add_component(generate_and)
 
-        fa = FullAdder(self, a, b, cin, prefix=self.prefix+"_fa" +str(self.get_instance_num(cls=FullAdder)), parent_component=self)
+        fa = FullAdder(a, b, cin, prefix=self.prefix+"_fa" +str(self.get_instance_num(cls=FullAdder)), parent_component=self)
         self.add_component(fa)
 
         self.out.connect(0, propagate_or.out)
