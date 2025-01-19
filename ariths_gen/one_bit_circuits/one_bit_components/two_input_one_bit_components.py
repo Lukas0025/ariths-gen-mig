@@ -1,5 +1,4 @@
 from ariths_gen.core.one_bit_circuits import TwoInputOneBitCircuit
-from .three_input_one_bit_components import FullAdder
 from ariths_gen.one_bit_circuits.logic_gates import AndGate, NandGate, OrGate, NorGate, NotGate
 from ariths_gen.one_bit_circuits import Maji
 from ariths_gen.wire_components import Wire, Bus
@@ -209,12 +208,22 @@ class partialAdder(TwoInputOneBitCircuit):
         generate_and = AndGate(a, b, prefix=self.prefix+"_and"+str(self.get_instance_num(cls=AndGate)), outid=1, parent_component=self)
         self.add_component(generate_and)
 
-        fa = FullAdder(a, b, cin, prefix=self.prefix+"_fa" +str(self.get_instance_num(cls=FullAdder)))
-        self.add_component(fa)
+        ##
+        # FA
+        obj_maji1 = Maji(cin, a, b, [True, False, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=2, parent_component=self)
+        self.add_component(obj_maji1)
+        
+        # cout
+        obj_maji2 = Maji(cin, a, b, [False, False, False], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=2, parent_component=self)
+        self.add_component(obj_maji2)
+
+        # sum
+        obj_maji3 = Maji(cin, obj_maji1.out, obj_maji2.out, [False, False, True], prefix=self.prefix+"_maji"+str(self.get_instance_num(cls=Maji)), outid=2, parent_component=self)
+        self.add_component(obj_maji3)
 
         self.out.connect(0, propagate_or.out)
         self.out.connect(1, generate_and.out)
-        self.out.connect(2, fa.get_sum_wire())
+        self.out.connect(2, obj_maji3.out)
 
     def get_propagate_wire(self):
         """Get output wire carrying propagate signal value.

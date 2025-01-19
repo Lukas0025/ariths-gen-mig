@@ -26,8 +26,6 @@ class FullAdder(ThreeInputOneBitCircuit):
         name (str, optional): Name of full adder. Defaults to "fa".
     """
     use_verilog_instance = False
-    disable_generation   = False
-
     def __init__(self, a: Wire = Wire(name="a"), b: Wire = Wire(name="b"), c: Wire = Wire(name="cin"), prefix: str = "", name: str = "fa"):
         super().__init__(a, b, c, prefix=prefix, name=name)
         # 2 wires for component's bus output (sum, cout)
